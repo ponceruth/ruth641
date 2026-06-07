@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprendo Jugando</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Arial Rounded MT Bold',Arial,sans-serif}
+.wrap{display:flex;justify-content:center;padding:1.5rem 0;background:transparent}
+.phone{width:340px;min-height:620px;background:#E6F1FB;border-radius:36px;border:3px solid #85B7EB;overflow:hidden;display:flex;flex-direction:column}
+.screen{display:none;flex-direction:column;flex:1}
+.screen.active{display:flex}
+.status-bar{background:#3C3489;padding:6px 16px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#CECBF6;flex-shrink:0}
+.home-header{background:#534AB7;padding:16px 20px 12px;text-align:center;flex-shrink:0}
+.home-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:2px}
+.home-sub{font-size:11px;color:#CECBF6}
+.stars{display:flex;justify-content:center;gap:4px;margin-top:6px;font-size:16px;color:#EF9F27}
+.chars-row{display:flex;justify-content:space-around;align-items:flex-end;background:#EEEDFE;padding:10px 16px 0;border-bottom:2px dashed #AFA9EC;flex-shrink:0}
+.char-box{text-align:center}
+.bubble{background:white;border:1.5px solid #AFA9EC;border-radius:12px;padding:4px 10px;font-size:10px;color:#3C3489;margin-bottom:4px}
+.char-svg{width:56px;height:70px}
+.char-name{font-size:11px;font-weight:700;padding:2px 0 8px}
+.luna-n{color:#3C3489}.teo-n{color:#085041}
+.greet{background:white;border-radius:14px;border:1.5px solid #B5D4F4;margin:12px 14px 0;padding:9px 12px;text-align:center;font-size:13px;font-weight:700;color:#185FA5}
+.act-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5F5E5A;padding:12px 14px 6px}
+.mods-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 12px}
+.mod-btn{border-radius:18px;padding:14px 10px 12px;text-align:center;border:2px solid transparent;cursor:pointer;background:none;font-family:inherit;width:100%}
+.mod-btn:hover{transform:scale(1.04)}
+.mod-ic{font-size:32px;margin-bottom:6px}
+.mod-nm{font-size:12px;font-weight:700;line-height:1.3}
+.m1-b{background:#EEEDFE;border-color:#7F77DD}.m1-b .mod-nm{color:#26215C}
+.m2-b{background:#E1F5EE;border-color:#1D9E75}.m2-b .mod-nm{color:#04342C}
+.m3-b{background:#FAEEDA;border-color:#BA7517}.m3-b .mod-nm{color:#412402}
+.m4-b{background:#FAECE7;border-color:#D85A30}.m4-b .mod-nm{color:#4A1B0C}
+.teachers-btn{margin:0 14px 14px;background:#534AB7;color:white;border:none;border-radius:12px;padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;width:calc(100% - 28px)}
+.mod-header{padding:12px 16px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.back-btn{background:rgba(255,255,255,0.3);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:white;font-family:inherit;flex-shrink:0}
+.mod-head-title{font-size:15px;font-weight:700;color:white;flex:1}
+.mod-head-ic{font-size:22px}
+.h1{background:#534AB7}.h2{background:#0F6E56}.h3{background:#854F0B}.h4{background:#993C1D}
+.mod-body{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.story-card{background:white;border-radius:16px;border:1.5px solid #AFA9EC;padding:14px}
+.story-scene{background:#EEEDFE;border-radius:12px;padding:16px;text-align:center;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:10px}
+.story-scene .s-icon{font-size:42px;margin-bottom:6px}
+.story-text{font-size:12px;color:#3C3489;line-height:1.6;text-align:center}
+.story-nav{display:flex;justify-content:space-between;align-items:center}
+.dots{display:flex;gap:5px}
+.dot{width:8px;height:8px;border-radius:50%;background:#AFA9EC}
+.dot.on{background:#534AB7}
+.s-btn{background:#534AB7;color:white;border:none;border-radius:10px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+.s-btn:disabled{opacity:0.3;cursor:default}
+.q-box{background:#EEEDFE;border-radius:12px;padding:12px;display:none}
+.q-box.show{display:block}
+.q-title{font-size:12px;font-weight:700;color:#3C3489;margin-bottom:8px}
+.q-opts{display:flex;flex-direction:column;gap:6px}
+.q-opt{background:white;border:1.5px solid #AFA9EC;border-radius:10px;padding:8px 12px;font-size:11px;color:#3C3489;cursor:pointer;font-family:inherit;text-align:left}
+.q-opt.correct{background:#E1F5EE;border-color:#1D9E75;color:#04342C}
+.q-opt.wrong{background:#FAECE7;border-color:#D85A30;color:#4A1B0C}
+.feedback{text-align:center;font-size:13px;font-weight:700;margin-top:6px;min-height:20px}
+.mem-score{display:flex;justify-content:space-between;background:white;border-radius:12px;padding:8px 14px;font-size:12px;font-weight:700;color:#085041}
+.mem-grid-wrap{background:white;border-radius:16px;padding:12px;border:1.5px solid #5DCAA5}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.m-card{height:56px;border-radius:10px;background:#1D9E75;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:background 0.2s;font-family:inherit}
+.m-card.flip{background:#9FE1CB}
+.m-card.matched{background:#E1F5EE;border:2px solid #1D9E75;cursor:default}
+.m-card.hidden-val{font-size:0}
+.mem-info{text-align:center;font-size:12px;color:#0F6E56;font-weight:700}
+.mem-reset{background:#1D9E75;color:white;border:none;border-radius:12px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;width:100%}
+.pron-char{text-align:center;background:white;border-radius:16px;padding:12px;border:1.5px solid #EF9F27}
+.pron-char-name{font-size:11px;color:#854F0B;margin-top:4px}
+.level-row{display:flex;gap:6px;justify-content:center}
+.lev-btn{border-radius:10px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid transparent;font-family:inherit;background:#FAEEDA;color:#633806;border-color:#EF9F27}
+.lev-btn.sel{background:#BA7517;color:white;border-color:#BA7517}
+.pron-display{background:white;border-radius:16px;padding:16px;text-align:center;border:1.5px solid #EF9F27}
+.pron-items{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.pron-item{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;cursor:pointer;border:2px solid #EF9F27;background:#FAEEDA;color:#412402;transition:all 0.15s}
+.pron-item.sel{background:#BA7517;color:white;border-color:#BA7517;transform:scale(1.12)}
+.pron-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;margin-bottom:12px}
+.w-bar{width:4px;border-radius:2px;background:#EF9F27;transition:height 0.2s}
+.pron-word-big{font-size:28px;font-weight:700;color:#412402;letter-spacing:6px;margin-bottom:12px}
+.pron-listen{background:#BA7517;color:white;border:none;border-radius:12px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%}
+.pron-listen.speaking{background:#993C1D;animation:pulse 0.5s infinite alternate}
+@keyframes pulse{from{opacity:1}to{opacity:0.6}}
+.speech-status{font-size:10px;color:#854F0B;margin-top:6px;min-height:14px;text-align:center}
+.song-list{display:flex;flex-direction:column;gap:10px}
+.song-card{background:white;border-radius:16px;padding:12px;border:1.5px solid #F0997B;display:flex;align-items:center;gap:12px;cursor:pointer}
+.song-card.playing{border-color:#D85A30;background:#FAECE7}
+.song-thumb-ic{font-size:32px;width:52px;height:52px;background:#FAECE7;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.song-info{flex:1}
+.song-nm{font-size:12px;font-weight:700;color:#4A1B0C;margin-bottom:3px}
+.song-dur{font-size:10px;color:#993C1D}
+.play-ic{font-size:20px;color:#D85A30}
+.player-box{background:white;border-radius:16px;padding:14px;border:1.5px solid #D85A30}
+.player-song{font-size:13px;font-weight:700;color:#4A1B0C;text-align:center;margin-bottom:8px}
+.progress-bar{background:#FAECE7;border-radius:4px;height:6px;margin-bottom:4px;overflow:hidden}
+.progress-fill{height:100%;background:#D85A30;border-radius:4px;transition:width 0.5s}
+.prog-times{display:flex;justify-content:space-between;font-size:10px;color:#993C1D;margin-bottom:10px}
+.player-ctrls{display:flex;justify-content:center;gap:12px;align-items:center}
+.ctrl-btn{border-radius:50%;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.ctrl-sm{width:34px;height:34px;background:#FAECE7;color:#993C1D;font-size:14px}
+.ctrl-lg{width:46px;height:46px;background:#D85A30;color:white;font-size:18px}
+.guide-card{background:white;border-radius:14px;padding:12px;border:1.5px solid #B5D4F4}
+.guide-title{font-size:13px;font-weight:700;color:#185FA5;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.guide-text{font-size:11px;color:#0C447C;line-height:1.6}
+.tip-row{display:flex;flex-direction:column;gap:6px}
+.tip{background:#E6F1FB;border-radius:10px;padding:8px 10px;font-size:11px;color:#185FA5;display:flex;gap:6px;align-items:flex-start}
+.tip-ic{font-size:14px;flex-shrink:0;margin-top:1px}
+.h-teachers{background:#185FA5}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="phone">
+  <div class="status-bar">
+    <span>9:41</span><span>Aprendo Jugando</span><span>🔋 100%</span>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="home-header">
+      <div class="home-title">🌟 Aprendo Jugando</div>
+      <div class="home-sub">herramienta educativa para primera infancia</div>
+      <div class="stars">★★★★★</div>
+    </div>
+    <div class="chars-row">
+      <div class="char-box">
+        <div class="bubble">¡Hola amigo!</div>
+        <svg class="char-svg" viewBox="0 0 56 70">
+          <ellipse cx="28" cy="16" rx="20" ry="6" fill="#3C3489"/>
+          <rect x="8" y="12" width="40" height="12" rx="3" fill="#3C3489"/>
+          <ellipse cx="28" cy="30" rx="18" ry="20" fill="#F5C4B3"/>
+          <ellipse cx="21" cy="26" rx="4" ry="4.5" fill="white"/>
+          <ellipse cx="35" cy="26" rx="4" ry="4.5" fill="white"/>
+          <circle cx="22" cy="27" r="2.5" fill="#3C3489"/>
+          <circle cx="36" cy="27" r="2.5" fill="#3C3489"/>
+          <circle cx="23" cy="26" r="1" fill="white"/>
+          <circle cx="37" cy="26" r="1" fill="white"/>
+          <path d="M22 38 Q28 44 34 38" stroke="#993C1D" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="16" cy="34" rx="4" ry="3" fill="#F0997B" opacity="0.5"/>
+          <ellipse cx="40" cy="34" rx="4" ry="3" fill="#F0997B" opacity="0.5"/>
+          <rect x="20" y="49" width="16" height="7" rx="3" fill="#F5C4B3"/>
+          <path d="M10 54 Q28 50 46 54 L48 70 Q28 74 8 70 Z" fill="#7F77DD"/>
+          <rect x="18" y="61" width="8" height="18" rx="4" fill="#534AB7"/>
+          <rect x="30" y="61" width="8" height="18" rx="4" fill="#534AB7"/>
+        </svg>
+        <div class="char-name luna-n">Luna</div>
+      </div>
+      <div class="char-box">
+        <div class="bubble">¡A jugar!</div>
+        <svg class="char-svg" viewBox="0 0 56 70">
+          <ellipse cx="28" cy="15" rx="18" ry="5" fill="#633806"/>
+          <rect x="10" y="11" width="36" height="10" rx="3" fill="#633806"/>
+          <ellipse cx="28" cy="30" rx="18" ry="20" fill="#FAC775"/>
+          <ellipse cx="8" cy="30" rx="4" ry="5" fill="#FAC775"/>
+          <ellipse cx="48" cy="30" rx="4" ry="5" fill="#FAC775"/>
+          <ellipse cx="21" cy="26" rx="4" ry="4.5" fill="white"/>
+          <ellipse cx="35" cy="26" rx="4" ry="4.5" fill="white"/>
+          <circle cx="22" cy="27" r="2.5" fill="#085041"/>
+          <circle cx="36" cy="27" r="2.5" fill="#085041"/>
+          <circle cx="23" cy="26" r="1" fill="white"/>
+          <circle cx="37" cy="26" r="1" fill="white"/>
+          <path d="M22 38 Q28 44 34 38" stroke="#633806" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="16" cy="34" rx="4" ry="3" fill="#EF9F27" opacity="0.4"/>
+          <ellipse cx="40" cy="34" rx="4" ry="3" fill="#EF9F27" opacity="0.4"/>
+          <rect x="20" y="49" width="16" height="7" rx="3" fill="#FAC775"/>
+          <path d="M10 54 Q28 50 46 54 L48 70 Q28 74 8 70 Z" fill="#1D9E75"/>
+          <rect x="18" y="61" width="8" height="18" rx="4" fill="#185FA5"/>
+          <rect x="30" y="61" width="8" height="18" rx="4" fill="#185FA5"/>
+        </svg>
+        <div class="char-name teo-n">Teo</div>
+      </div>
+    </div>
+    <div class="greet">🌟 ¡Bienvenido! ¿Qué quieres aprender hoy?</div>
+    <div class="act-label">Actividades</div>
+    <div class="mods-grid">
+      <button class="mod-btn m1-b" onclick="go('s-cuentos')">
+        <div class="mod-ic">📚</div>
+        <div class="mod-nm">Cuentos digitales</div>
+      </button>
+      <button class="mod-btn m2-b" onclick="go('s-memoria')">
+        <div class="mod-ic">🧠</div>
+        <div class="mod-nm">Juegos de memoria</div>
+      </button>
+      <button class="mod-btn m3-b" onclick="go('s-pron')">
+        <div class="mod-ic">🎤</div>
+        <div class="mod-nm">Pronunciación</div>
+      </button>
+      <button class="mod-btn m4-b" onclick="go('s-canciones')">
+        <div class="mod-ic">🎵</div>
+        <div class="mod-nm">Canciones educativas</div>
+      </button>
+    </div>
+    <button class="teachers-btn" onclick="go('s-docentes')">
+      👥 Sección para docentes y padres
+    </button>
+  </div>
+
+  <!-- CUENTOS -->
+  <div class="screen" id="s-cuentos">
+    <div class="mod-header h1">
+      <button class="back-btn" onclick="go('s-home')">←</button>
+      <div class="mod-head-ic">📚</div>
+      <div class="mod-head-title">Cuentos digitales</div>
+    </div>
+    <div class="mod-body">
+      <div class="story-card">
+        <div class="story-scene" id="story-scene">
+          <div class="s-icon" id="s-icon">🌿</div>
+          <div class="story-text" id="s-text"></div>
+        </div>
+        <div class="story-nav">
+          <button class="s-btn" id="s-prev" onclick="storyNav(-1)" disabled>←</button>
+          <div class="dots" id="s-dots"></div>
+          <button class="s-btn" id="s-next" onclick="storyNav(1)">→</button>
+        </div>
+      </div>
+      <div class="q-box" id="q-box">
+        <div class="q-title" id="q-title"></div>
+        <div class="q-opts" id="q-opts"></div>
+        <div class="feedback" id="q-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMORIA -->
+  <div class="screen" id="s-memoria">
+    <div class="mod-header h2">
+      <button class="back-btn" onclick="go('s-home')">←</button>
+      <div class="mod-head-ic">🧠</div>
+      <div class="mod-head-title">Juegos de memoria</div>
+    </div>
+    <div class="mod-body">
+      <div class="mem-score">
+        <span>Pares: <span id="pairs-found">0</span>/6</span>
+        <span>Intentos: <span id="attempts">0</span></span>
+      </div>
+      <div class="mem-grid-wrap">
+        <div class="mem-grid" id="mem-grid"></div>
+      </div>
+      <div class="mem-info" id="mem-info">¡Toca las cartas y encuentra los pares!</div>
+      <button class="mem-reset" onclick="initMemory()">🔄 Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <!-- PRONUNCIACIÓN -->
+  <div class="screen" id="s-pron">
+    <div class="mod-header h3">
+      <button class="back-btn" onclick="go('s-home')">←</button>
+      <div class="mod-head-ic">🎤</div>
+      <div class="mod-head-title">Pronunciación</div>
+    </div>
+    <div class="mod-body">
+      <div class="pron-char">
+        <svg width="60" height="48" viewBox="0 0 56 48">
+          <ellipse cx="28" cy="10" rx="18" ry="5" fill="#3C3489"/>
+          <ellipse cx="28" cy="22" rx="16" ry="16" fill="#F5C4B3"/>
+          <ellipse cx="22" cy="19" rx="3.5" ry="4" fill="white"/>
+          <ellipse cx="34" cy="19" rx="3.5" ry="4" fill="white"/>
+          <circle cx="23" cy="20" r="2" fill="#3C3489"/>
+          <circle cx="35" cy="20" r="2" fill="#3C3489"/>
+          <path d="M22 31 Q28 36 34 31" stroke="#993C1D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <rect x="18" y="37" width="20" height="11" rx="4" fill="#7F77DD"/>
+        </svg>
+        <div class="pron-char-name">Luna te guía</div>
+      </div>
+      <div class="level-row">
+        <button class="lev-btn sel" onclick="setLevel('vocales',this)">Vocales</button>
+        <button class="lev-btn" onclick="setLevel('silabas',this)">Sílabas</button>
+        <button class="lev-btn" onclick="setLevel('palabras',this)">Palabras</button>
+      </div>
+      <div class="pron-display">
+        <div class="pron-items" id="pron-items"></div>
+        <div class="pron-wave" id="pron-wave"></div>
+        <div class="pron-word-big" id="pron-word">A</div>
+        <button class="pron-listen" id="pron-listen-btn" onclick="escucharConLuna()">🔊 Escuchar con Luna</button>
+        <div class="speech-status" id="speech-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANCIONES -->
+  <div class="screen" id="s-canciones">
+    <div class="mod-header h4">
+      <button class="back-btn" onclick="go('s-home')">←</button>
+      <div class="mod-head-ic">🎵</div>
+      <div class="mod-head-title">Canciones educativas</div>
+    </div>
+    <div class="mod-body">
+      <div class="player-box">
+        <div class="player-song" id="player-name">🌈 Los colores del arcoíris</div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+        <div class="prog-times"><span id="prog-cur">0:00</span><span id="prog-tot">2:15</span></div>
+        <div class="player-ctrls">
+          <button class="ctrl-btn ctrl-sm" onclick="prevSong()">⏮</button>
+          <button class="ctrl-btn ctrl-lg" id="play-btn" onclick="togglePlay()">▶</button>
+          <button class="ctrl-btn ctrl-sm" onclick="nextSong()">⏭</button>
+        </div>
+      </div>
+      <div class="song-list" id="song-list"></div>
+    </div>
+  </div>
+
+  <!-- DOCENTES -->
+  <div class="screen" id="s-docentes">
+    <div class="mod-header h-teachers">
+      <button class="back-btn" onclick="go('s-home')">←</button>
+      <div class="mod-head-ic">👥</div>
+      <div class="mod-head-title">Docentes y padres</div>
+    </div>
+    <div class="mod-body">
+      <div class="guide-card">
+        <div class="guide-title">📚 Acerca de Aprendo Jugando</div>
+        <div class="guide-text">Herramienta diseñada para niños de 3 a 6 años. Fortalece el desarrollo cognitivo y del lenguaje mediante actividades lúdicas digitales, fundamentada en Piaget (1973) y Vygotsky (1978).</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-title">💡 Sugerencias pedagógicas</div>
+        <div class="tip-row">
+          <div class="tip"><span class="tip-ic">📚</span><span>Use los <b>cuentos</b> para iniciar la clase. Haga preguntas antes, durante y después de la lectura.</span></div>
+          <div class="tip"><span class="tip-ic">🧠</span><span>El <b>juego de memoria</b> refuerza atención. Permita que el niño juegue en parejas para fomentar interacción social.</span></div>
+          <div class="tip"><span class="tip-ic">🎤</span><span><b>Pronunciación</b>: practique primero vocales, luego sílabas y palabras. Repita con el niño en voz alta.</span></div>
+          <div class="tip"><span class="tip-ic">🎵</span><span>Las <b>canciones</b> pueden usarse en momentos de transición o como rutina de cierre de jornada.</span></div>
+        </div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-title">🏠 Uso en el hogar</div>
+        <div class="guide-text">Sugiera a los padres 15-20 minutos diarios de uso supervisado. Pida que el niño cuente lo que aprendió y repitan juntos las actividades de pronunciación.</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-title">🎯 Habilidades que desarrolla</div>
+        <div class="tip-row">
+          <div class="tip"><span class="tip-ic">🧠</span><span>Atención y memoria</span></div>
+          <div class="tip"><span class="tip-ic">💬</span><span>Lenguaje oral y pronunciación</span></div>
+          <div class="tip"><span class="tip-ic">👀</span><span>Asociación imagen-sonido</span></div>
+          <div class="tip"><span class="tip-ic">🕐</span><span>Coordinación motriz fina</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ── NAVEGACIÓN ── */
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── WEB SPEECH API ── */
+var synth = window.speechSynthesis;
+var vozES = null;
+
+function cargarVoces(){
+  var voces = synth.getVoices();
+  vozES = voces.find(function(v){ return v.lang.startsWith('es'); }) || voces[0] || null;
+}
+
+if(synth){
+  cargarVoces();
+  if(synth.onvoiceschanged !== undefined){ synth.onvoiceschanged = cargarVoces; }
+}
+
+function hablar(texto, onEnd){
+  if(!synth) return;
+  synth.cancel();
+  var utt = new SpeechSynthesisUtterance(texto);
+  utt.lang = 'es-ES';
+  utt.rate = 0.85;
+  utt.pitch = 1.1;
+  utt.volume = 1;
+  if(vozES) utt.voice = vozES;
+  if(onEnd) utt.onend = onEnd;
+  synth.speak(utt);
+}
+
+/* ── CUENTOS ── */
+var pages = [
+  {ic:'🌿', txt:'En el jardín de las palabras vivía una mariposa llamada Lila que quería aprender a hablar con las flores.'},
+  {ic:'🌹', txt:'Un día, Lila encontró una rosa roja. Buenos días, rosa, dijo con voz suave. ¡Buenos días! respondió la rosa.'},
+  {ic:'🌻', txt:'Lila aprendió que cada flor tenía un nombre especial: margarita, girasol, violeta. ¡Las palabras son como flores!'},
+  {ic:'🎉', txt:'Al final del día, Lila había aprendido diez palabras nuevas y las repitió una por una antes de dormir.'},
+  {ic:'⭐', txt:'¡Fin! Lila descubrió que hablar y escuchar es la mejor manera de hacer amigos en el jardín de la vida.'},
+  {ic:'✏️', txt:null, question:true}
+];
+var sp = 0;
+var qAnswered = false;
+
+function renderStory(){
+  var pg = pages[sp];
+  document.getElementById('s-icon').textContent = pg.ic;
+  document.getElementById('s-text').textContent = pg.txt || '';
+  document.getElementById('s-prev').disabled = (sp === 0);
+  document.getElementById('s-next').disabled = (sp === pages.length - 1);
+  var dots = document.getElementById('s-dots');
+  dots.innerHTML = '';
+  for(var i = 0; i < pages.length; i++){
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === sp ? ' on' : '');
+    dots.appendChild(d);
+  }
+  var qb = document.getElementById('q-box');
+  if(pg.question){
+    document.getElementById('s-text').textContent = '¡Respondé las preguntas!';
+    qb.classList.add('show');
+    if(!qAnswered) renderQuestion();
+  } else {
+    qb.classList.remove('show');
+    if(pg.txt) hablar(pg.txt);
+  }
+}
+
+function renderQuestion(){
+  document.getElementById('q-title').textContent = '🤔 ¿Cómo se llamaba la mariposa del cuento?';
+  var opts = ['Lila', 'Rosa', 'Luna', 'Violeta'];
+  var correct = 0;
+  var c = document.getElementById('q-opts');
+  c.innerHTML = '';
+  opts.forEach(function(o, i){
+    var b = document.createElement('button');
+    b.className = 'q-opt';
+    b.textContent = o;
+    b.onclick = function(){
+      if(qAnswered) return;
+      qAnswered = true;
+      document.querySelectorAll('.q-opt').forEach(function(btn, j){
+        if(j === correct) btn.classList.add('correct');
+        else if(j === i && i !== correct) btn.classList.add('wrong');
+      });
+      var fb = (i === correct)
+        ? '🎉 ¡Muy bien! ¡Correcto!'
+        : '😔 Casi... era Lila. ¡Sigue practicando!';
+      document.getElementById('q-feedback').textContent = fb;
+      hablar(fb);
+    };
+    c.appendChild(b);
+  });
+}
+
+function storyNav(d){
+  sp = Math.max(0, Math.min(pages.length - 1, sp + d));
+  renderStory();
+}
+
+renderStory();
+
+/* ── MEMORIA ── */
+var emojis = ['🌺','🌺','🌻','🌻','🌼','🌼','🌹','🌹','🌸','🌸','🌿','🌿'];
+var flipped = [], matched = [], attempts = 0, pairsFound = 0, locked = false;
+
+function shuffle(a){
+  for(var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function initMemory(){
+  var cards = shuffle(emojis.slice());
+  flipped = []; matched = []; attempts = 0; pairsFound = 0; locked = false;
+  document.getElementById('pairs-found').textContent = '0';
+  document.getElementById('attempts').textContent = '0';
+  document.getElementById('mem-info').textContent = '¡Toca las cartas y encuentra los pares!';
+  var grid = document.getElementById('mem-grid');
+  grid.innerHTML = '';
+  cards.forEach(function(em, i){
+    var btn = document.createElement('button');
+    btn.className = 'm-card hidden-val';
+    btn.dataset.em = em;
+    btn.dataset.idx = i;
+    btn.textContent = '🤔';
+    btn.onclick = function(){ flipCard(btn, em, i); };
+    grid.appendChild(btn);
+  });
+}
+
+function flipCard(btn, em, idx){
+  if(locked || flipped.length >= 2 || matched.includes(idx) || flipped.find(function(f){ return f.idx === idx; })) return;
+  btn.textContent = btn.dataset.em;
+  btn.classList.add('flip');
+  btn.classList.remove('hidden-val');
+  flipped.push({btn:btn, em:em, idx:idx});
+  if(flipped.length === 2){
+    attempts++;
+    document.getElementById('attempts').textContent = attempts;
+    locked = true;
+    setTimeout(function(){
+      if(flipped[0].em === flipped[1].em){
+        flipped.forEach(function(f){ f.btn.classList.add('matched'); f.btn.classList.remove('flip'); f.btn.onclick = null; });
+        matched.push(flipped[0].idx, flipped[1].idx);
+        pairsFound++;
+        document.getElementById('pairs-found').textContent = pairsFound;
+        if(pairsFound === 6){
+          document.getElementById('mem-info').textContent = '🎉 ¡Encontraste todos los pares! ¡Excelente!';
+          hablar('¡Felicitaciones! ¡Encontraste todos los pares! ¡Eres muy inteligente!');
+        } else {
+          document.getElementById('mem-info').textContent = '✅ ¡Par encontrado!';
+          hablar('¡Muy bien! ¡Par encontrado!');
+        }
+      } else {
+        flipped.forEach(function(f){ f.btn.textContent = '🤔'; f.btn.classList.remove('flip'); f.btn.classList.add('hidden-val'); });
+        document.getElementById('mem-info').textContent = '😔 Casi... ¡Sigue intentando!';
+      }
+      flipped = []; locked = false;
+    }, 900);
+  }
+}
+
+initMemory();
+
+/* ── PRONUNCIACIÓN ── */
+var levels = {
+  vocales:  {items: ['A','E','I','O','U']},
+  silabas:  {items: ['MA','ME','MI','PA','PE','PI']},
+  palabras: {items: ['MAMÁ','PAPÁ','LUNA','TETO','CASA']}
+};
+var curLevel = 'vocales';
+var selItem = 'A';
+
+function setLevel(lv, btn){
+  curLevel = lv;
+  document.querySelectorAll('.lev-btn').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  selItem = levels[lv].items[0];
+  renderPron();
+}
+
+function renderPron(){
+  var lv = levels[curLevel];
+  var c = document.getElementById('pron-items');
+  c.innerHTML = '';
+  lv.items.forEach(function(it){
+    var b = document.createElement('div');
+    b.className = 'pron-item' + (it === selItem ? ' sel' : '');
+    b.textContent = it;
+    b.onclick = function(){ selItem = it; renderPron(); };
+    c.appendChild(b);
+  });
+  document.getElementById('pron-word').textContent = selItem;
+  buildWave(false);
+}
+
+function buildWave(anim){
+  var w = document.getElementById('pron-wave');
+  w.innerHTML = '';
+  var heights = anim ? [8,16,24,32,20,28,12,22,18,10] : [4,4,4,4,4,4,4,4,4,4];
+  heights.forEach(function(h){
+    var d = document.createElement('div');
+    d.className = 'w-bar';
+    d.style.height = h + 'px';
+    w.appendChild(d);
+  });
+}
+
+function escucharConLuna(){
+  if(!synth){
+    document.getElementById('speech-status').textContent = 'Tu navegador no soporta síntesis de voz.';
+    return;
+  }
+  var btn = document.getElementById('pron-listen-btn');
+  var status = document.getElementById('speech-status');
+
+  // Texto: repetir 3 veces despacio
+  var texto = selItem + '... ' + selItem + '... ' + selItem;
+
+  btn.classList.add('speaking');
+  btn.textContent = '🔊 Escuchando...';
+  status.textContent = 'Escuchá con atención...';
+  buildWave(true);
+
+  hablar(texto, function(){
+    btn.classList.remove('speaking');
+    btn.textContent = '🔊 Escuchar con Luna';
+    status.textContent = '¡Ahora repetí vos!';
+    buildWave(false);
+    setTimeout(function(){ status.textContent = ''; }, 3000);
+  });
+}
+
+renderPron();
+
+/* ── CANCIONES ── */
+var songs = [
+  {
+    name: 'Los colores del arcoíris',
+    ic: '🌈', dur: '2:15', secs: 135,
+    letra: 'Rojo, naranja, amarillo y verde, azul, añil y violeta también. Los siete colores del arcoíris son bellos, búscalos cuando llueva otra vez.'
+  },
+  {
+    name: 'Contemos juntos del 1 al 10',
+    ic: '🔢', dur: '1:58', secs: 118,
+    letra: 'Uno, dos, tres, cuatro y cinco. Seis, siete, ocho, nueve y diez. ¡Contar es muy divertido, lo podemos hacer otra vez!'
+  },
+  {
+    name: 'Las vocales con Luna',
+    ic: '🎤', dur: '2:30', secs: 150,
+    letra: 'La A de árbol, la E de estrella, la I de iglú, la O de oso, la U de uva. ¡Las cinco vocales, apréndetelas tú!'
+  },
+  {
+    name: 'Buenos días amiguitos',
+    ic: '🌤️', dur: '1:45', secs: 105,
+    letra: 'Buenos días amiguitos, ¿cómo están hoy? Listos para aprender, aquí estoy yo. Con Luna y con Teo vamos a jugar, cantando y aprendiendo sin parar.'
+  }
+];
+var curSong = 0, playing = false, progSecs = 0, songTimer = null;
+
+function renderSongList(){
+  var list = document.getElementById('song-list');
+  list.innerHTML = '';
+  songs.forEach(function(s, i){
+    var d = document.createElement('div');
+    d.className = 'song-card' + (i === curSong && playing ? ' playing' : '');
+    d.innerHTML =
+      '<div class="song-thumb-ic">' + s.ic + '</div>' +
+      '<div class="song-info"><div class="song-nm">' + s.name + '</div><div class="song-dur">⏰ ' + s.dur + '</div></div>' +
+      '<div class="play-ic">' + (i === curSong && playing ? '⏸' : '▶') + '</div>';
+    d.onclick = function(){
+      if(curSong === i && playing){ togglePlay(); return; }
+      curSong = i; progSecs = 0; playing = true;
+      startTimer();
+      updatePlayer();
+      cantarCancion(i);
+    };
+    list.appendChild(d);
+  });
+}
+
+function cantarCancion(idx){
+  synth.cancel();
+  var s = songs[idx];
+  hablar(s.letra);
+}
+
+function updatePlayer(){
+  var s = songs[curSong];
+  document.getElementById('player-name').textContent = s.ic + ' ' + s.name;
+  document.getElementById('prog-tot').textContent = s.dur;
+  var pct = Math.round((progSecs / s.secs) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  var m = Math.floor(progSecs / 60), sc = progSecs % 60;
+  document.getElementById('prog-cur').textContent = m + ':' + (sc < 10 ? '0' : '') + sc;
+  document.getElementById('play-btn').textContent = playing ? '⏸' : '▶';
+  renderSongList();
+}
+
+function startTimer(){
+  clearInterval(songTimer);
+  if(playing){
+    songTimer = setInterval(function(){
+      if(progSecs < songs[curSong].secs){ progSecs++; updatePlayer(); }
+      else{ playing = false; progSecs = 0; clearInterval(songTimer); synth.cancel(); updatePlayer(); }
+    }, 1000);
+  }
+}
+
+function togglePlay(){
+  playing = !playing;
+  if(playing){
+    startTimer();
+    cantarCancion(curSong);
+  } else {
+    clearInterval(songTimer);
+    synth.cancel();
+  }
+  updatePlayer();
+}
+
+function prevSong(){
+  curSong = Math.max(0, curSong - 1);
+  progSecs = 0; playing = false;
+  clearInterval(songTimer); synth.cancel();
+  updatePlayer();
+}
+
+function nextSong(){
+  curSong = Math.min(songs.length - 1, curSong + 1);
+  progSecs = 0; playing = false;
+  clearInterval(songTimer); synth.cancel();
+  updatePlayer();
+}
+
+updatePlayer();
+</script>
+</body>
+</html>
